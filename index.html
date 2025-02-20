@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scientific Calculator</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        .calculator {
+            width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .display {
+            width: 100%;
+            height: 40px;
+            margin-bottom: 20px;
+            padding: 10px;
+            font-size: 24px;
+            text-align: right;
+            border: 1px solid #ccc;
+        }
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-gap: 10px;
+        }
+        .button {
+            width: 100%;
+            height: 40px;
+            padding: 10px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .light-theme {
+            background-color: #fff;
+        }
+        .light-theme .button {
+            background-color: #4CAF50;
+            color: #fff;
+        }
+        .light-theme .button:hover {
+            background-color: #3e8e41;
+        }
+        .dark-theme {
+            background-color: #333;
+            color: #fff;
+        }
+        .dark-theme .button {
+            background-color: #555;
+            color: #fff;
+        }
+        .dark-theme .button:hover {
+            background-color: #444;
+        }
+        .neon-theme {
+            background-color: #111;
+            color: #fff;
+        }
+        .neon-theme .button {
+            background-color: #333;
+            color: #0f0;
+            border: 1px solid #0f0;
+        }
+        .neon-theme .button:hover {
+            background-color: #222;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator light-theme" id="calculator">
+        <input type="text" class="display" id="display" disabled>
+        <div class="keypad">
+            <button class="button" onclick="clearDisplay()">C</button>
+            <button class="button" onclick="backspace()">DEL</button>
+            <button class="button" onclick="absoluteValue()">|x|</button>
+            <button class="button" onclick="switchTheme()">Theme</button>
+            <button class="button" onclick="appendNumber('7')">7</button>
+            <button class="button" onclick="appendNumber('8')">8</button>
+            <button class="button" onclick="appendNumber('9')">9</button>
+            <button class="button" onclick="appendOperator('/')">/</button>
+            <button class="button" onclick="appendNumber('4')">4</button>
+            <button class="button" onclick="appendNumber('5')">5</button>
+            <button class="button" onclick="appendNumber('6')">6</button>
+            <button class="button" onclick="appendOperator('*')">*</button>
+            <button class="button" onclick="appendNumber('1')">1</button>
+            <button class="button" onclick="appendNumber('2')">2</button>
+            <button class="button" onclick="appendNumber('3')">3</button>
+            <button class="button" onclick="appendOperator('-')">-</button>
+            <button class="button" onclick="appendNumber('0')">0</button>
+            <button class="button" onclick="appendNumber('.')">.</button>
+            <button class="button" onclick="calculate()">=</button>
+            <button class="button" onclick="appendOperator('+')">+</button>
+            <button class="button" onclick="sin()">sin</button>
+            <button class="button" onclick="cos()">cos</button>
+            <button class="button" onclick="tan()">tan</button>
+            <button class="button" onclick="exp()">e^x</button>
+            <button class="button" onclick="log()">log</button>
+            <button class="button" onclick="sqrt()">√</button>
+            <button class="button" onclick="power()">x^y</button>
+            <button class="button" onclick="oneOverX()">1/x</button>
+        </div>
+    </div>
+
+    <script>
+        let display = document.getElementById('display');
+        let currentNumber = '';
+        let previousNumber = '';
+        let operator = '';
+        let calculator = document.getElementById('calculator');
+        let currentTheme = 'light-theme';
+        let themes = ['light-theme', 'dark-theme', 'neon-theme'];
+
+        function clearDisplay() {
+            display.value = '';
+            currentNumber = '';
+            previousNumber = '';
+            operator = '';
+        }
+
+        function backspace() {
+            currentNumber = currentNumber.slice(0, -1);
+            display.value = currentNumber;
+        }
+
+        function appendNumber(number) {
+            currentNumber += number;
+            display.value = currentNumber;
+        }
+
+        function appendOperator(op) {
+            previousNumber = currentNumber;
+            currentNumber = '';
+            operator = op;
+            display.value = previousNumber + ' ' + operator;
+        }
+
+        function calculate() {
+            let result;
+            switch (operator) {
+                case '+':
+                    result = parseFloat(previousNumber) + parseFloat(currentNumber);
+                    break;
+                case '-':
+                    result = parseFloat(previousNumber) - parseFloat(currentNumber);
+                    break;
+                case '*':
+                    result = parseFloat(previousNumber) * parseFloat(currentNumber);
+                    break;
+                case '/':
+                    result = parseFloat(previousNumber) / parseFloat(currentNumber);
+                    break;
+                default:
+                    result = '';
+            }
+            display.value = result;
+            currentNumber = result.toString();
+            previousNumber = '';
+            operator = '';
+        }
+
+        function absoluteValue() {
+            let result = Math.abs(parseFloat(currentNumber));
+            display.value = result;
+            currentNumber = result.toString();
+        }
+
+        function sin() {
+            let result = Math.sin(parseFloat(currentNumber));
+            display.value = result;
+            currentNumber = result.toString();
+        }
+
+        function cos() {
+            let result = Math.cos(parseFloat(currentNumber));
+            display.value = result;
+            currentNumber = result.toString();
+        }
+
+        function tan() {
+            let result = Math.tan(parseFloat(currentNumber));
+            display.value = result;
+            currentNumber = result.toString();
+        }
+
+        function exp() {
+            let result = Math.exp(parseFloat(currentNumber));
+            display.value = result;
+            currentNumber = result.toString();
+        }
+
+        function log() {
+            let result = Math.log(parseFloat(currentNumber));
+            display.value = result;
+            currentNumber = result.toString();
+        }
+
+        function sqrt() {
+            let result = Math.sqrt(parseFloat(currentNumber));
+            display.value = result;
+            currentNumber = result.toString();
+        }
+
+        function power() {
+            previousNumber = currentNumber;
+            currentNumber = '';
+            operator = '^';
+            display.value = previousNumber + ' ' + operator;
+        }
+
+        function oneOverX() {
+            let result = 1 / parseFloat(currentNumber);
+            display.value = result;
+            currentNumber = result.toString();
+        }
+
+        function switchTheme() {
+            let index = themes.indexOf(currentTheme);
+            currentTheme = themes[(index + 1) % themes.length];
+            calculator.className = 'calculator ' + currentTheme;
+            localStorage.setItem('theme', currentTheme);
+        }
+
+        window.onload = function() {
+            currentTheme = localStorage.getItem('theme') || 'light-theme';
+            calculator.className = 'calculator ' + currentTheme;
+        }
+    </script>
+</body>
+</html>
