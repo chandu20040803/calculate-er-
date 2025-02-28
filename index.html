@@ -2,482 +2,644 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Scientific Calculator</title>
-  <!-- Bootstrap CSS -->
+  <title>Secret Words - Ultimate Pro Edition</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+  <!-- Bootstrap 5 -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Bootstrap Icons -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css">
   <style>
-    body {
-      background: linear-gradient(135deg, #2ecc71, #3498db);
-      font-family: Arial, sans-serif;
-      color: #fff;
+    /* ==================== CSS Variables ==================== */
+    :root {
+      --primary-color: #2ecc71;
+      --secondary-color: #3498db;
+      --accent-color: #e74c3c;
+      --dark-color: #2c3e50;
+      --light-color: #ecf0f1;
+      --calculator-bg: rgba(255, 255, 255, 0.15);
+      --calculator-border: rgba(255, 255, 255, 0.25);
+      --transition-speed: 0.3s;
+      --border-radius: 15px;
+      --neon-glow: 0 0 15px var(--primary-color);
+      --glass-bg: rgba(255, 255, 255, 0.1);
+      --glass-border: rgba(255, 255, 255, 0.2);
+    }
+
+    /* ==================== Global Styles ==================== */
+    * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
-    .calculator-card {
-      max-width: 500px;
-      margin: 50px auto;
-      border-radius: 15px;
-      overflow: hidden;
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+
+    body {
+      background: linear-gradient(135deg, var(--dark-color), #34495e);
+      font-family: 'Roboto', sans-serif;
+      color: var(--light-color);
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
     }
-    .card-body {
-      padding: 20px;
+
+    /* ==================== Custom Scrollbar ==================== */
+    ::-webkit-scrollbar {
+      width: 8px;
     }
-    .display {
-      height: 60px;
-      font-size: 28px;
-      text-align: right;
-      padding: 10px 15px;
+
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.1);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--primary-color);
+      border-radius: 4px;
+    }
+
+    /* ==================== Utility Classes ==================== */
+    .glass-effect {
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    .neon-glow {
+      box-shadow: var(--neon-glow);
+      animation: glow-pulse 2s infinite alternate;
+    }
+
+    /* ==================== Animations ==================== */
+    @keyframes glow-pulse {
+      from { box-shadow: 0 0 5px var(--primary-color); }
+      to { box-shadow: 0 0 20px var(--primary-color); }
+    }
+
+    @keyframes slideIn {
+      from { transform: translateY(50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* ==================== Navbar Styles ==================== */
+    .main-nav {
+      background: rgba(0, 0, 0, 0.3);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-brand {
+      font-family: 'Orbitron', sans-serif;
+      letter-spacing: 2px;
+    }
+
+    /* ==================== Calculator Styles ==================== */
+    .calculator-container {
+      max-width: 400px;
+      margin: 2rem auto;
+      border-radius: var(--border-radius);
+      animation: slideIn 0.5s ease-out;
+    }
+
+    .calculator-display {
+      background: rgba(0, 0, 0, 0.3);
+      height: 100px;
+      border-radius: var(--border-radius);
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.5rem;
+      color: var(--primary-color);
+      text-shadow: var(--neon-glow);
+      padding: 1rem;
+    }
+
+    .calc-btn {
+      height: 70px;
+      font-size: 1.5rem;
+      transition: all var(--transition-speed) ease;
       border: none;
-      border-radius: 10px;
-      background-color: rgba(255, 255, 255, 0.8);
-      color: #333;
-      margin-bottom: 15px;
-      transition: background-color 0.3s;
     }
-    .keypad {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-    }
-    .btn-calculator {
-      font-size: 18px;
-      padding: 15px;
-      border-radius: 8px;
-      transition: transform 0.1s, box-shadow 0.2s;
-    }
-    .btn-calculator:hover {
+
+    .calc-btn:hover {
       transform: scale(1.05);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      filter: brightness(1.2);
     }
-    .btn-memory {
-      background-color: #ff9800;
-      color: #fff;
+
+    /* ==================== Notepad Styles ==================== */
+    .notepad-container {
+      max-width: 800px;
+      margin: 2rem auto;
+      border-radius: var(--border-radius);
     }
-    /* Theme Overrides */
-    .light-theme .card {
-      background-color: #fff;
-      color: #333;
+
+    .note-editor {
+      min-height: 400px;
+      background: rgba(255, 255, 255, 0.9);
+      color: #2c3e50;
+      border: none;
+      border-radius: var(--border-radius);
+      padding: 1.5rem;
     }
-    .dark-theme .card {
-      background-color: #343a40;
-      color: #fff;
+
+    .media-preview {
+      max-width: 200px;
+      border-radius: 10px;
+      transition: transform var(--transition-speed);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
-    .dark-theme .display {
-      background-color: #495057;
-      color: #fff;
+
+    .media-preview:hover {
+      transform: scale(1.05);
     }
-    .neon-theme .card {
-      background-color: #111;
-      color: #0f0;
-      border: 1px solid #0f0;
+
+    .recording-preview {
+      margin-top: 0.5rem;
     }
-    .neon-theme .display {
-      background-color: #222;
-      color: #0f0;
-      border: 2px solid #0f0;
+
+    /* ==================== Auth Form Styles ==================== */
+    .auth-form {
+      max-width: 500px;
+      margin: 2rem auto;
+      padding: 2rem;
+      border-radius: var(--border-radius);
     }
-    .auto-theme .card {
-      background-color: #f8f9fa;
-      color: #333;
+
+    .form-input {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: var(--light-color);
+    }
+
+    /* ==================== Responsive Design ==================== */
+    @media (max-width: 768px) {
+      .calculator-container, .notepad-container {
+        margin: 1rem;
+        border-radius: 10px;
+      }
+
+      .calc-btn {
+        height: 60px;
+        font-size: 1.2rem;
+      }
+
+      .note-editor {
+        min-height: 300px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="calculator-card card shadow-lg">
-      <div class="card-body">
-        <h4 class="card-title text-center mb-4">Scientific Calculator</h4>
-        <input type="text" class="display form-control" id="display" disabled>
-        <div id="history" class="mb-3 text-end"></div>
-        <div class="keypad mb-3">
-          <!-- Memory Functions Row -->
-          <button class="btn btn-memory btn-calculator" onclick="memoryClear()" data-bs-toggle="tooltip" title="Memory Clear">MC</button>
-          <button class="btn btn-memory btn-calculator" onclick="memoryRecall()" data-bs-toggle="tooltip" title="Memory Recall">MR</button>
-          <button class="btn btn-memory btn-calculator" onclick="memoryStore()" data-bs-toggle="tooltip" title="Memory Store">MS</button>
-          <button class="btn btn-memory btn-calculator" onclick="memoryAdd()" data-bs-toggle="tooltip" title="Memory Add">M+</button>
-          <button class="btn btn-memory btn-calculator" onclick="memorySubtract()" data-bs-toggle="tooltip" title="Memory Subtract">M-</button>
-          <!-- Empty cells to complete the row -->
-          <div></div>
-          <div></div>
-          <div></div>
-          
-          <!-- Standard Calculator Buttons -->
-          <button class="btn btn-danger btn-calculator" onclick="clearDisplay()">C</button>
-          <button class="btn btn-warning btn-calculator" onclick="backspace()"><i class="bi bi-backspace"></i></button>
-          <button class="btn btn-info btn-calculator" onclick="absoluteValue()">|x|</button>
-          <button class="btn btn-secondary btn-calculator" onclick="switchTheme()">Theme</button>
-          
-          <button class="btn btn-light btn-calculator" onclick="appendNumber('7')">7</button>
-          <button class="btn btn-light btn-calculator" onclick="appendNumber('8')">8</button>
-          <button class="btn btn-light btn-calculator" onclick="appendNumber('9')">9</button>
-          <button class="btn btn-primary btn-calculator" onclick="appendOperator('/')">/</button>
-          
-          <button class="btn btn-light btn-calculator" onclick="appendNumber('4')">4</button>
-          <button class="btn btn-light btn-calculator" onclick="appendNumber('5')">5</button>
-          <button class="btn btn-light btn-calculator" onclick="appendNumber('6')">6</button>
-          <button class="btn btn-primary btn-calculator" onclick="appendOperator('*')">*</button>
-          
-          <button class="btn btn-light btn-calculator" onclick="appendNumber('1')">1</button>
-          <button class="btn btn-light btn-calculator" onclick="appendNumber('2')">2</button>
-          <button class="btn btn-light btn-calculator" onclick="appendNumber('3')">3</button>
-          <button class="btn btn-primary btn-calculator" onclick="appendOperator('-')">-</button>
-          
-          <button class="btn btn-light btn-calculator" onclick="appendNumber('0')">0</button>
-          <button class="btn btn-light btn-calculator" onclick="appendNumber('.')">.</button>
-          <button class="btn btn-danger btn-calculator" onclick="calculate()">=</button>
-          <button class="btn btn-primary btn-calculator" onclick="appendOperator('+')">+</button>
-          
-          <!-- Scientific Functions -->
-          <button class="btn btn-outline-light btn-calculator" onclick="sin()">sin</button>
-          <button class="btn btn-outline-light btn-calculator" onclick="cos()">cos</button>
-          <button class="btn btn-outline-light btn-calculator" onclick="tan()">tan</button>
-          <button class="btn btn-outline-light btn-calculator" onclick="exp()">e^x</button>
-          <button class="btn btn-outline-light btn-calculator" onclick="log()">log</button>
-          <button class="btn btn-outline-light btn-calculator" onclick="sqrt()">√</button>
-          <button class="btn btn-outline-light btn-calculator" onclick="power()">x^y</button>
-          <button class="btn btn-outline-light btn-calculator" onclick="oneOverX()">1/x</button>
-          <button class="btn btn-outline-light btn-calculator" onclick="sinh()">sinh</button>
-          <button class="btn btn-outline-light btn-calculator" onclick="cosh()">cosh</button>
-          <button class="btn btn-outline-light btn-calculator" onclick="tanh()">tanh</button>
-          <button class="btn btn-outline-info btn-calculator" onclick="login()">Login</button>
-          <button class="btn btn-outline-success btn-calculator" onclick="register()">Register</button>
-        </div>
+  <!-- ==================== Navigation ==================== -->
+  <nav class="navbar navbar-expand-lg main-nav">
+    <div class="container-fluid">
+      <a class="navbar-brand nav-brand" href="#">
+        <i class="bi bi-lock-fill"></i> SecretWords Pro
+      </a>
+      <div class="d-flex">
+        <button class="btn btn-outline-primary me-2" onclick="showSection('calculator')">
+          <i class="bi bi-calculator"></i> Calculator
+        </button>
+        <button class="btn btn-outline-success" onclick="showSection('auth')">
+          <i class="bi bi-person-circle"></i> Login/Register
+        </button>
       </div>
     </div>
-  </div>
+  </nav>
 
-  <!-- Personal Notes Modal -->
-  <div class="modal fade" id="personalNoteModal" tabindex="-1" aria-labelledby="personalNoteModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="personalNoteModalLabel">Personal Notes</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <textarea id="personalNotes" class="form-control" rows="10"></textarea>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" onclick="savePersonalNotes()">Save</button>
-        </div>
+  <!-- ==================== Calculator Section ==================== -->
+  <section id="calculatorSection" class="calculator-container glass-effect p-3">
+    <div class="calculator-display d-flex flex-column p-3 mb-3">
+      <div class="text-muted fs-6">Scientific Calculator</div>
+      <div id="display" class="mt-auto text-end">0</div>
+    </div>
+    <div class="row g-2">
+      <!-- Calculator buttons -->
+      <div class="col-3">
+        <button class="btn btn-dark calc-btn w-100" onclick="handleScientific('sin')">sin</button>
+      </div>
+      <div class="col-3">
+        <button class="btn btn-dark calc-btn w-100" onclick="handleScientific('cos')">cos</button>
+      </div>
+      <div class="col-3">
+        <button class="btn btn-dark calc-btn w-100" onclick="handleScientific('tan')">tan</button>
+      </div>
+      <div class="col-3">
+        <button class="btn btn-dark calc-btn w-100" onclick="handleScientific('log')">log</button>
+      </div>
+      <div class="col-3">
+        <button class="btn btn-secondary calc-btn w-100" onclick="clearDisplay()">C</button>
+      </div>
+      <div class="col-3">
+        <button class="btn btn-secondary calc-btn w-100" onclick="backspace()">←</button>
+      </div>
+      <div class="col-3">
+        <button class="btn btn-secondary calc-btn w-100" onclick="handleScientific('sqrt')">√</button>
+      </div>
+      <div class="col-3">
+        <button class="btn btn-secondary calc-btn w-100" onclick="handleScientific('pow')">x^y</button>
+      </div>
+      <div class="col-3">
+        <button class="btn btn-light calc-btn w-100" onclick="appendNumber('7')">7</button>
+      </div>
+      <div class="col-3">
+        <button class="btn btn-light calc-btn w-100" onclick="appendNumber('8')">8</button>
+      </div>
+      <div class="col-3">
+        <button class="btn btn-light calc-btn w-100" onclick="appendNumber('9')">9</button>
+      </div>
+      <div class="col-3">
+        <button class="btn btn-primary calc-btn w-100" onclick="appendOperator('/')">÷</button>
+      </div>
+      <div class="col-3">
+        <button class="btn btn-light calc-btn w-100" onclick="appendNumber('4')">4</button>
+      </div>
+      <div class="col-3">
+        <button class="btn btn-light calc-btn w-100" onclick="appendNumber('5')">5</button>
+      </div>
+      <div class="col-3">
+        <button class="btn btn-light calc-btn w-100" onclick="appendNumber('6')">6</button>
+      </div>
+      <div class="col-3">
+        <button class="btn btn-primary calc-btn w-100" onclick="appendOperator('*')">×</button>
+      </div>
+      <div class="col-3">
+        <button class="btn btn-light calc-btn w-100" onclick="appendNumber('1')">1</button>
+      </div>
+      <div class="col-3">
+        <button class="btn btn-light calc-btn w-100" onclick="appendNumber('2')">2</button>
+      </div>
+      <div class="col-3">
+        <button class="btn btn-light calc-btn w-100" onclick="appendNumber('3')">3</button>
+      </div>
+      <div class="col-3">
+        <button class="btn btn-primary calc-btn w-100" onclick="appendOperator('-')">-</button>
+      </div>
+      <div class="col-3">
+        <button class="btn btn-light calc-btn w-100" onclick="appendNumber('0')">0</button>
+      </div>
+      <div class="col-3">
+        <button class="btn btn-light calc-btn w-100" onclick="appendNumber('.')">.</button>
+      </div>
+      <div class="col-3">
+        <button class="btn btn-danger calc-btn w-100" onclick="calculate()">=</button>
+      </div>
+      <div class="col-3">
+        <button class="btn btn-primary calc-btn w-100" onclick="appendOperator('+')">+</button>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- Bootstrap JS Bundle -->
+  <!-- ==================== Authentication Section ==================== -->
+  <section id="authSection" class="auth-form glass-effect" style="display: none;">
+    <ul class="nav nav-tabs mb-4" id="authTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="login-tab" data-bs-toggle="tab" data-bs-target="#login" type="button">Login</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="register-tab" data-bs-toggle="tab" data-bs-target="#register" type="button">Register</button>
+      </li>
+    </ul>
+    <div class="tab-content">
+      <div class="tab-pane fade show active" id="login">
+        <form id="loginForm">
+          <div class="mb-3">
+            <input type="text" class="form-control form-input" name="username" placeholder="Username" required>
+          </div>
+          <div class="mb-3">
+            <input type="password" class="form-control form-input" name="password" placeholder="Password" required>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Sign In</button>
+        </form>
+      </div>
+      <div class="tab-pane fade" id="register">
+        <form id="registerForm">
+          <div class="mb-3">
+            <input type="text" class="form-control form-input" name="username" placeholder="Username" required>
+          </div>
+          <div class="mb-3">
+            <input type="email" class="form-control form-input" name="email" placeholder="Email" required>
+          </div>
+          <div class="mb-3">
+            <input type="password" class="form-control form-input" name="password" placeholder="Password" required>
+          </div>
+          <button type="submit" class="btn btn-success w-100">Create Account</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== Notepad Section ==================== -->
+  <section id="notepadSection" class="notepad-container glass-effect p-4" style="display: none;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h3><i class="bi bi-journal-text"></i> Secure Notepad</h3>
+      <div class="d-flex gap-2">
+        <input type="date" class="form-control glass-effect" id="noteDate">
+        <button class="btn btn-primary" onclick="saveNote()">
+          <i class="bi bi-save"></i> Save
+        </button>
+      </div>
+    </div>
+    <textarea class="note-editor form-control mb-3" id="noteContent" placeholder="Start writing..."></textarea>
+    <div class="file-management mb-4">
+      <!-- File Upload -->
+      <input type="file" id="fileUpload" hidden accept="image/*, .pdf, .txt, audio/*">
+      <div class="d-flex gap-2">
+        <button class="btn btn-success" onclick="document.getElementById('fileUpload').click()">
+          <i class="bi bi-upload"></i> Upload File
+        </button>
+        <!-- Recording Button -->
+        <button class="btn btn-info" id="recordButton" onclick="toggleRecording()">
+          <i class="bi bi-mic"></i> Record Audio
+        </button>
+      </div>
+      <!-- Media Preview for Files -->
+      <div id="mediaPreview" class="mt-3 d-flex flex-wrap"></div>
+    </div>
+    <!-- ==================== Recorded Audio Section ==================== -->
+    <div class="recordings-section mt-4">
+      <h4><i class="bi bi-music-note-beamed"></i> Recorded Audios</h4>
+      <div id="recordingsList" class="list-group"></div>
+    </div>
+    <div class="saved-notes mt-4">
+      <h4 class="mb-3"><i class="bi bi-archive"></i> Saved Notes</h4>
+      <div id="notesList" class="list-group"></div>
+    </div>
+  </section>
+
+  <!-- ==================== Bootstrap & Custom Scripts ==================== -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    let display = document.getElementById('display');
-    let history = document.getElementById('history');
+    // ==================== Global Variables ====================
+    let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+    let notes = JSON.parse(localStorage.getItem('secureNotes')) || [];
+    // Global array for recordings (persisted in localStorage)
+    let recordings = JSON.parse(localStorage.getItem('recordings')) || [];
+    let isRecording = false;
+    let mediaRecorder;
+    let audioChunks = [];
     let currentNumber = '';
     let previousNumber = '';
     let operator = '';
-    let currentTheme = 'light-theme';
-    let themes = ['light-theme', 'dark-theme', 'neon-theme', 'auto-theme'];
-    let personalNumber = '';
-    let personalNotes = '';
-    let memory = 0; // Memory storage
 
+    // ==================== Section Management ====================
+    function showSection(sectionId) {
+      document.querySelectorAll('section').forEach(section => {
+        section.style.display = 'none';
+      });
+      document.getElementById(sectionId + 'Section').style.display = 'block';
+    }
+
+    // ==================== Calculator Logic ====================
     function clearDisplay() {
-      display.value = '';
       currentNumber = '';
       previousNumber = '';
       operator = '';
+      document.getElementById('display').textContent = '0';
     }
 
-    function backspace() {
-      if (currentNumber !== '') {
-        currentNumber = currentNumber.slice(0, -1);
-        display.value = currentNumber;
+    function appendNumber(num) {
+      if (currentNumber.length < 15) {
+        currentNumber += num;
+        updateDisplay();
       }
-    }
-
-    function appendNumber(number) {
-      currentNumber += number;
-      display.value = currentNumber;
-      checkPersonalNumber();
     }
 
     function appendOperator(op) {
-      previousNumber = currentNumber;
-      currentNumber = '';
-      operator = op;
-      display.value = previousNumber + ' ' + operator;
+      if (currentNumber !== '') {
+        previousNumber = currentNumber;
+        currentNumber = '';
+        operator = op;
+        updateDisplay();
+      }
     }
 
     function calculate() {
-      if (operator === '') return;
       let result;
-      try {
-        switch (operator) {
-          case '+':
-            result = parseFloat(previousNumber) + parseFloat(currentNumber);
-            break;
-          case '-':
-            result = parseFloat(previousNumber) - parseFloat(currentNumber);
-            break;
-          case '*':
-            result = parseFloat(previousNumber) * parseFloat(currentNumber);
-            break;
-          case '/':
-            result = parseFloat(currentNumber) !== 0 ? parseFloat(previousNumber) / parseFloat(currentNumber) : 'Error: Division by zero';
-            break;
-          case '^':
-            result = Math.pow(parseFloat(previousNumber), parseFloat(currentNumber));
-            break;
-          default:
-            result = '';
+      const prev = parseFloat(previousNumber);
+      const curr = parseFloat(currentNumber);
+      if (isNaN(prev) || isNaN(curr)) return;
+      switch (operator) {
+        case '+':
+          result = prev + curr;
+          break;
+        case '-':
+          result = prev - curr;
+          break;
+        case '*':
+          result = prev * curr;
+          break;
+        case '/':
+          result = prev / curr;
+          break;
+        default:
+          return;
+      }
+      currentNumber = result.toString();
+      operator = '';
+      previousNumber = '';
+      updateDisplay();
+    }
+
+    function updateDisplay() {
+      document.getElementById('display').textContent = currentNumber || '0';
+    }
+
+    // ==================== Note Management ====================
+    class NoteManager {
+      constructor() {
+        this.notes = notes;
+      }
+      addNote(content) {
+        const newNote = {
+          id: Date.now(),
+          content,
+          date: new Date().toISOString()
+        };
+        this.notes.push(newNote);
+        this.saveToStorage();
+        return newNote;
+      }
+      saveToStorage() {
+        localStorage.setItem('secureNotes', JSON.stringify(this.notes));
+      }
+      renderNotes() {
+        const container = document.getElementById('notesList');
+        container.innerHTML = this.notes.map(note => `
+          <div class="list-group-item">
+            <span>${new Date(note.date).toLocaleString()}: ${note.content}</span>
+          </div>
+        `).join('');
+      }
+    }
+    const noteManager = new NoteManager();
+
+    // ==================== Media Handling ====================
+    class MediaHandler {
+      static handleFileUpload(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve({
+            type: file.type,
+            name: file.name,
+            data: reader.result
+          });
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      }
+      static previewMedia(data) {
+        const previewContainer = document.getElementById('mediaPreview');
+        let element;
+        if(data.type.startsWith('image/')) {
+          element = document.createElement('img');
+          element.src = data.data;
+          element.className = 'media-preview';
+        } else if(data.type.startsWith('audio/')) {
+          element = document.createElement('audio');
+          element.src = data.data;
+          element.controls = true;
+          element.className = 'recording-preview';
         }
-        display.value = result;
-        currentNumber = result.toString();
-        previousNumber = '';
-        operator = '';
-        sendCalculationToServer(previousNumber, operator, currentNumber, result);
-      } catch (e) {
-        display.value = 'Error: Invalid input';
-      }
-    }
-
-    function absoluteValue() {
-      try {
-        let result = Math.abs(parseFloat(currentNumber));
-        display.value = result;
-        currentNumber = result.toString();
-        sendCalculationToServer(currentNumber, '', '', result);
-      } catch (e) {
-        display.value = 'Error: Invalid input';
-      }
-    }
-
-    function sin() {
-      try {
-        let result = Math.sin(parseFloat(currentNumber));
-        display.value = result;
-        currentNumber = result.toString();
-        sendCalculationToServer(currentNumber, 'sin', '', result);
-      } catch (e) {
-        display.value = 'Error: Invalid input';
-      }
-    }
-
-    function cos() {
-      try {
-        let result = Math.cos(parseFloat(currentNumber));
-        display.value = result;
-        currentNumber = result.toString();
-        sendCalculationToServer(currentNumber, 'cos', '', result);
-      } catch (e) {
-        display.value = 'Error: Invalid input';
-      }
-    }
-
-    function tan() {
-      try {
-        let result = Math.tan(parseFloat(currentNumber));
-        display.value = result;
-        currentNumber = result.toString();
-        sendCalculationToServer(currentNumber, 'tan', '', result);
-      } catch (e) {
-        display.value = 'Error: Invalid input';
-      }
-    }
-
-    function exp() {
-      try {
-        let result = Math.exp(parseFloat(currentNumber));
-        display.value = result;
-        currentNumber = result.toString();
-        sendCalculationToServer(currentNumber, 'exp', '', result);
-      } catch (e) {
-        display.value = 'Error: Invalid input';
-      }
-    }
-
-    function log() {
-      try {
-        if (parseFloat(currentNumber) > 0) {
-          let result = Math.log(parseFloat(currentNumber));
-          display.value = result;
-          currentNumber = result.toString();
-          sendCalculationToServer(currentNumber, 'log', '', result);
-        } else {
-          display.value = 'Error: Logarithm of non-positive number';
+        if(element) {
+          previewContainer.appendChild(element);
         }
-      } catch (e) {
-        display.value = 'Error: Invalid input';
       }
     }
 
-    function sqrt() {
-      try {
-        if (parseFloat(currentNumber) >= 0) {
-          let result = Math.sqrt(parseFloat(currentNumber));
-          display.value = result;
-          currentNumber = result.toString();
-          sendCalculationToServer(currentNumber, 'sqrt', '', result);
-        } else {
-          display.value = 'Error: Negative number';
+    // ==================== Voice Recording ====================
+    class VoiceRecorder {
+      static startRecording() {
+        navigator.mediaDevices.getUserMedia({ audio: true })
+          .then(stream => {
+            mediaRecorder = new MediaRecorder(stream);
+            mediaRecorder.start();
+            mediaRecorder.ondataavailable = e => {
+              audioChunks.push(e.data);
+            };
+            mediaRecorder.onstop = () => {
+              const blob = new Blob(audioChunks, { type: 'audio/webm' });
+              audioChunks = [];
+              MediaHandler.handleFileUpload(blob).then(data => {
+                // Preview recorded audio and save it
+                MediaHandler.previewMedia(data);
+                addRecording(data);
+              });
+            };
+          });
+      }
+      static stopRecording() {
+        if (mediaRecorder) {
+          mediaRecorder.stop();
         }
-      } catch (e) {
-        display.value = 'Error: Invalid input';
       }
     }
 
-    function power() {
-      previousNumber = currentNumber;
-      currentNumber = '';
-      operator = '^';
-      display.value = previousNumber + ' ' + operator;
-    }
-
-    function oneOverX() {
-      try {
-        if (parseFloat(currentNumber) !== 0) {
-          let result = 1 / parseFloat(currentNumber);
-          display.value = result;
-          currentNumber = result.toString();
-          sendCalculationToServer(currentNumber, '1/', '', result);
-        } else {
-          display.value = 'Error: Division by zero';
-        }
-      } catch (e) {
-        display.value = 'Error: Invalid input';
+    function toggleRecording() {
+      if (!isRecording) {
+        VoiceRecorder.startRecording();
+        isRecording = true;
+        document.getElementById('recordButton').innerHTML = '<i class="bi bi-stop"></i> Stop';
+      } else {
+        VoiceRecorder.stopRecording();
+        isRecording = false;
+        document.getElementById('recordButton').innerHTML = '<i class="bi bi-mic"></i> Record Audio';
       }
     }
 
-    function sinh() {
-      try {
-        let result = (Math.exp(parseFloat(currentNumber)) - Math.exp(-parseFloat(currentNumber))) / 2;
-        display.value = result;
-        currentNumber = result.toString();
-        sendCalculationToServer(currentNumber, 'sinh', '', result);
-      } catch (e) {
-        display.value = 'Error: Invalid input';
-      }
-    }
-
-    function cosh() {
-      try {
-        let result = (Math.exp(parseFloat(currentNumber)) + Math.exp(-parseFloat(currentNumber))) / 2;
-        display.value = result;
-        currentNumber = result.toString();
-        sendCalculationToServer(currentNumber, 'cosh', '', result);
-      } catch (e) {
-        display.value = 'Error: Invalid input';
-      }
-    }
-
-    function tanh() {
-      try {
-        let result = (Math.exp(parseFloat(currentNumber)) - Math.exp(-parseFloat(currentNumber))) /
-                     (Math.exp(parseFloat(currentNumber)) + Math.exp(-parseFloat(currentNumber)));
-        display.value = result;
-        currentNumber = result.toString();
-        sendCalculationToServer(currentNumber, 'tanh', '', result);
-      } catch (e) {
-        display.value = 'Error: Invalid input';
-      }
-    }
-
-    function switchTheme() {
-      let index = themes.indexOf(currentTheme);
-      currentTheme = themes[(index + 1) % themes.length];
-      document.querySelector('.calculator-card').className = 'calculator-card card shadow-lg ' + currentTheme;
-      localStorage.setItem('theme', currentTheme);
-    }
-
-    function sendCalculationToServer(num1, op, num2, result) {
-      fetch('/calculate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ num1, op, num2, result })
-      })
-      .then(response => response.json())
-      .then(data => console.log(data))
-      .catch(error => console.error('Error:', error));
-    }
-
-    function login() {
-      let username = 'user';
-      let password = 'password';
-      fetch('/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
-      })
-      .then(response => response.json())
-      .then(data => console.log(data))
-      .catch(error => console.error('Error:', error));
-    }
-
-    function register() {
-      let username = 'user';
-      let password = 'password';
-      fetch('/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
-      })
-      .then(response => response.json())
-      .then(data => console.log(data))
-      .catch(error => console.error('Error:', error));
-    }
-
-    function checkPersonalNumber() {
-      if (currentNumber.length === 10 && currentNumber === personalNumber) {
-        const modal = new bootstrap.Modal(document.getElementById('personalNoteModal'), { keyboard: false });
-        modal.show();
-      }
-    }
-
-    function savePersonalNotes() {
-      personalNotes = document.getElementById('personalNotes').value;
-      localStorage.setItem('personalNotes', personalNotes);
-      const modal = bootstrap.Modal.getInstance(document.getElementById('personalNoteModal'));
-      modal.hide();
-    }
-
-    // Memory Functions
-    function memoryStore() {
-      memory = parseFloat(currentNumber) || 0;
-    }
-    function memoryRecall() {
-      currentNumber = memory.toString();
-      display.value = currentNumber;
-    }
-    function memoryClear() {
-      memory = 0;
-    }
-    function memoryAdd() {
-      memory += parseFloat(currentNumber) || 0;
-    }
-    function memorySubtract() {
-      memory -= parseFloat(currentNumber) || 0;
-    }
-
-    window.onload = function() {
-      currentTheme = localStorage.getItem('theme') || 'light-theme';
-      document.querySelector('.calculator-card').className = 'calculator-card card shadow-lg ' + currentTheme;
-      if (currentTheme === 'auto-theme') {
-        document.querySelector('.calculator-card').className = 'calculator-card card shadow-lg ' +
-          (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark-theme' : 'light-theme');
-      }
-      personalNumber = '1234567890';
-      personalNotes = localStorage.getItem('personalNotes') || '';
-      document.getElementById('personalNotes').value = personalNotes;
-      // Initialize Bootstrap tooltips
-      var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-      tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
+    // ==================== Recording Management ====================
+    function addRecording(recordingData) {
+      recordings.push({
+        id: Date.now(),
+        name: 'Recording ' + (recordings.length + 1),
+        data: recordingData.data,
+        date: new Date().toISOString()
       });
+      localStorage.setItem('recordings', JSON.stringify(recordings));
+      renderRecordings();
     }
+
+    function renderRecordings() {
+      const container = document.getElementById('recordingsList');
+      container.innerHTML = recordings.map(rec => `
+        <div class="list-group-item d-flex justify-content-between align-items-center">
+          <div>
+            <strong>${rec.name}</strong> <br>
+            <small>${new Date(rec.date).toLocaleString()}</small>
+          </div>
+          <div>
+            <audio controls src="${rec.data}"></audio>
+            <button class="btn btn-sm btn-secondary ms-2" onclick="sendVoiceMessageEmail(${rec.id})">
+              <i class="bi bi-envelope"></i> Email
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ==================== Voice Message Email Option ====================
+    function sendVoiceMessageEmail(recId) {
+      const rec = recordings.find(r => r.id === recId);
+      if (!rec) {
+        alert("Recording not found.");
+        return;
+      }
+      const email = prompt("Enter the email address to send the voice message:");
+      if (email) {
+        // For demo purposes, using a mailto: link to open the email client
+        const subject = encodeURIComponent("Voice Message from SecretWords Pro");
+        const body = encodeURIComponent("Please find the voice message below:\n" + rec.data);
+        window.location.href = "mailto:" + email + "?subject=" + subject + "&body=" + body;
+      }
+    }
+
+    // ==================== Authentication Logic ====================
+    function handleLogin(event) {
+      event.preventDefault();
+      const username = event.target.username.value;
+      const password = event.target.password.value;
+      if (username && password) {
+        currentUser = { username };
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        alert('Login successful!');
+        showSection('notepad');
+      }
+    }
+
+    function handleRegister(event) {
+      event.preventDefault();
+      const username = event.target.username.value;
+      const email = event.target.email.value;
+      const password = event.target.password.value;
+      if (username && email && password) {
+        alert('Registration successful!');
+        showSection('auth');
+      }
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', handleLogin);
+    document.getElementById('registerForm').addEventListener('submit', handleRegister);
+
+    // ==================== File Upload Handling ====================
+    document.getElementById('fileUpload').addEventListener('change', async event => {
+      const file = event.target.files[0];
+      if (file) {
+        try {
+          const fileData = await MediaHandler.handleFileUpload(file);
+          MediaHandler.previewMedia(fileData);
+        } catch (error) {
+          console.error('File upload failed', error);
+        }
+      }
+    });
+
+    // ==================== Initialization ====================
+    document.addEventListener('DOMContentLoaded', () => {
+      noteManager.renderNotes();
+      renderRecordings();
+      if (currentUser) {
+        showSection('notepad');
+      } else {
+        showSection('auth');
+      }
+    });
   </script>
 </body>
 </html>
